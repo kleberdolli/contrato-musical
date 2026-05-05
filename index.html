@@ -590,8 +590,46 @@
       return lines.length ? lines : [""];
     }
 
-    function createPdf() {
+    function loadPhotoForPdf() {
+      return new Promise((resolve) => {
+        const image = new Image();
+        image.onload = () => {
+          const size = 90;
+          const canvas = document.createElement("canvas");
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#fbf4ea";
+          ctx.fillRect(0, 0, size, size);
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, 40, 0, Math.PI * 2);
+          ctx.clip();
+          const scale = Math.max(size / image.width, size / image.height);
+          const width = image.width * scale;
+          const height = image.height * scale;
+          ctx.drawImage(image, (size - width) / 2, (size - height) / 2, width, height);
+          ctx.restore();
+          ctx.strokeStyle = "#c49a3c";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, 40, 0, Math.PI * 2);
+          ctx.stroke();
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+          resolve({
+            binary: atob(dataUrl.split(",")[1]),
+            height: size,
+            width: size
+          });
+        };
+        image.onerror = () => resolve(null);
+        image.src = "foto-contrato.png";
+      });
+    }
+
+    async function createPdf() {
       const data = collectData();
+      const photo = await loadPhotoForPdf();
       const lines = [];
 
       function add(text = "", size = 10, bold = false, gap = 13) {
@@ -647,6 +685,9 @@
       const content = [];
       content.push("0.98 0.957 0.918 rg 0 0 595 842 re f");
       content.push("0.769 0.604 0.235 RG 2 w 28 28 539 786 re S");
+      if (photo) {
+        content.push("q 76 0 0 76 474 728 cm /Im1 Do Q");
+      }
       let y = 790;
       lines.forEach((line) => {
         if (y < 45) return;
@@ -657,14 +698,18 @@
       });
 
       const stream = content.join("\n");
+      const imageResource = photo ? " /XObject << /Im1 7 0 R >>" : "";
       const objects = [
         "<< /Type /Catalog /Pages 2 0 R >>",
         "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>",
+        `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >>${imageResource} >> /Contents 6 0 R >>`,
         "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
         "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>",
         `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`
       ];
+      if (photo) {
+        objects.push(`<< /Type /XObject /Subtype /Image /Width ${photo.width} /Height ${photo.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${photo.binary.length} >>\nstream\n${photo.binary}\nendstream`);
+      }
       let pdf = "%PDF-1.4\n";
       const offsets = [0];
       objects.forEach((object, index) => {
