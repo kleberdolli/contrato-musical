@@ -398,6 +398,7 @@
 <body>
   <div class="toolbar" aria-label="Ações do contrato">
     <button type="button" id="saveButton">Salvar dados</button>
+    <button type="button" class="secondary" id="pdfButton">Gerar PDF</button>
     <button type="button" class="secondary" id="printButton">Imprimir</button>
     <button type="button" class="secondary" id="downloadButton">Baixar preenchido</button>
     <button type="button" class="danger" id="clearButton">Limpar para novo contrato</button>
@@ -564,6 +565,131 @@
       setStatus("Arquivo preenchido baixado.");
     }
 
+    function pdfEscape(text) {
+      return String(text || "")
+        .replace(/\\/g, "\\\\")
+        .replace(/\(/g, "\\(")
+        .replace(/\)/g, "\\)")
+        .replace(/\r?\n/g, " ");
+    }
+
+    function wrapText(text, maxChars) {
+      const words = String(text || "").split(/\s+/).filter(Boolean);
+      const lines = [];
+      let line = "";
+      words.forEach((word) => {
+        const test = line ? `${line} ${word}` : word;
+        if (test.length > maxChars && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = test;
+        }
+      });
+      if (line) lines.push(line);
+      return lines.length ? lines : [""];
+    }
+
+    function createPdf() {
+      const data = collectData();
+      const lines = [];
+
+      function add(text = "", size = 10, bold = false, gap = 13) {
+        lines.push({ text, size, bold, gap });
+      }
+
+      function addWrapped(text, size = 10, maxChars = 92) {
+        wrapText(text, maxChars).forEach((line) => add(line, size, false, 12));
+      }
+
+      add("CONTRATO DE PRESTACAO DE SERVICO", 16, true, 18);
+      add("DE EVENTO MUSICAL", 13, true, 18);
+      add("Documento de formalizacao de contratacao artistica", 9, false, 11);
+      add(data.ano, 9, false, 22);
+
+      add("DADOS DO EVENTO", 12, true, 16);
+      add(`Contratante: ${data.aniversariante}`, 10);
+      add(`Data do Evento: ${data.dataEvento}`, 10);
+      add(`Horario: ${data.horario}`, 10);
+      add(`E-mail: ${data.email}`, 10);
+      addWrapped(`Endereco: ${data.endereco}`, 10, 86);
+      add("", 10, false, 10);
+
+      add("1. OBJETO", 12, true, 16);
+      addWrapped(`O CONTRATADO compromete-se a realizar apresentacao musical ao vivo com duracao de ${data.duracaoNumero} (${data.duracaoExtenso}) horas, incluindo intervalo, na data, horario e local especificados acima.`, 10);
+      addWrapped("§ 1º O CONTRATADO nao se responsabiliza por fatores externos que impecam ou dificultem a realizacao do evento, exceto por falhas em seu proprio equipamento.", 10);
+      addWrapped("§ 2º Em caso de desistencia por qualquer das partes apos a assinatura deste instrumento, sera aplicada multa equivalente a 50% (cinquenta por cento) do valor total do contrato.", 10);
+      add("", 10, false, 8);
+
+      add("2. PAGAMENTO", 12, true, 16);
+      addWrapped("A assinatura deste contrato requer o pagamento antecipado de 50% (cinquenta por cento) do valor total acordado. O saldo restante devera ser quitado integralmente ao final da apresentacao, antes da desmontagem do equipamento.", 10);
+      add("", 10, false, 8);
+
+      add("3. CONDICOES GERAIS", 12, true, 16);
+      addWrapped("O CONTRATANTE compromete-se a garantir condicoes adequadas para a realizacao do evento, incluindo: fornecimento de energia eletrica estavel (minimo 2 tomadas 20A), espaco fisico adequado para instalacao do equipamento, e acesso ao local com antecedencia minima de 60 minutos para montagem.", 10);
+      add("", 10, false, 8);
+
+      add("4. VALOR CONTRATADO", 12, true, 16);
+      add(`Valor Total: ${data.valorTotal}`, 12, true, 18);
+      add("(50% na assinatura + 50% ao final da apresentacao)", 9, false, 22);
+
+      add("ASSINATURAS", 12, true, 16);
+      addWrapped("Ao assinar este documento, ambas as partes declaram estar cientes e de acordo com todas as clausulas acima.", 10);
+      add("", 10, false, 32);
+      add("________________________________        ________________________________", 10, false, 13);
+      add("CONTRATADO                              CONTRATANTE", 10, true, 13);
+      add(`${data.contratado || " "}                              ${data.contratante || " "}`, 9, false, 34);
+      add("________________________________", 10, false, 13);
+      add("Local e Data", 9, false, 12);
+      add(data.localData, 9, false, 20);
+      add("Documento gerado para formalizacao de servico artistico - 1 via para cada parte", 8, false, 10);
+
+      const content = [];
+      content.push("0.98 0.957 0.918 rg 0 0 595 842 re f");
+      content.push("0.769 0.604 0.235 RG 2 w 28 28 539 786 re S");
+      let y = 790;
+      lines.forEach((line) => {
+        if (y < 45) return;
+        const font = line.bold ? "/F2" : "/F1";
+        const safe = pdfEscape(line.text);
+        content.push(`BT ${font} ${line.size} Tf 0.141 0.086 0.035 rg 42 ${y} Td (${safe}) Tj ET`);
+        y -= line.gap;
+      });
+
+      const stream = content.join("\n");
+      const objects = [
+        "<< /Type /Catalog /Pages 2 0 R >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>",
+        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
+        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>",
+        `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`
+      ];
+      let pdf = "%PDF-1.4\n";
+      const offsets = [0];
+      objects.forEach((object, index) => {
+        offsets.push(pdf.length);
+        pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+      });
+      const xref = pdf.length;
+      pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+      offsets.slice(1).forEach((offset) => {
+        pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
+      });
+      pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+
+      const bytes = new Uint8Array(pdf.length);
+      for (let i = 0; i < pdf.length; i += 1) bytes[i] = pdf.charCodeAt(i) & 255;
+      const blob = new Blob([bytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "contrato-evento-musical.pdf";
+      link.click();
+      URL.revokeObjectURL(url);
+      setStatus("PDF gerado.");
+    }
+
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       try {
@@ -581,6 +707,7 @@
     });
 
     document.querySelector("#saveButton").addEventListener("click", saveData);
+    document.querySelector("#pdfButton").addEventListener("click", createPdf);
     document.querySelector("#printButton").addEventListener("click", () => window.print());
     document.querySelector("#downloadButton").addEventListener("click", downloadFilledContract);
     document.querySelector("#clearButton").addEventListener("click", clearData);
