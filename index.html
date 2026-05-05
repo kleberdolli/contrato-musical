@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contrato de Prestação de Serviço - Evento Musical</title>
+  <style>
+    :root {
+      --paper: #fbf4ea;
+      --line: #e9dcc8;
+      --brown: #3d1f0a;
+      --copper: #c45f1a;
+      --gold: #c49a3c;
+      --muted: #7b5c42;
+      --ink: #241609;
+      --field: #fffaf3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background: #ece4d8;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 14px;
+      background: #fffaf3;
+      border-bottom: 1px solid #d9c7ad;
+      box-shadow: 0 4px 18px rgba(57, 31, 10, 0.12);
+    }
+
+    button {
+      min-height: 38px;
+      border: 1px solid #b68c55;
+      border-radius: 6px;
+      padding: 0 14px;
+      color: #fff;
+      background: var(--brown);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      color: var(--brown);
+      background: #fff;
+    }
+
+    button.danger {
+      background: #8d2f1d;
+      border-color: #8d2f1d;
+    }
+
+    .status {
+      min-width: 170px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    main {
+      width: min(100%, 940px);
+      margin: 26px auto;
+      padding: 0 14px;
+    }
+
+    .page {
+      position: relative;
+      max-width: 794px;
+      min-height: 1123px;
+      margin: 0 auto;
+      padding: 42px 48px;
+      background:
+        repeating-linear-gradient(to bottom, transparent 0, transparent 31px, var(--line) 32px),
+        var(--paper);
+      border: 3px solid var(--gold);
+      border-radius: 10px;
+      box-shadow: inset 0 0 0 4px #fff6e8, 0 18px 50px rgba(45, 30, 12, 0.16);
+    }
+
+    .page::before,
+    .page::after {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--gold);
+      transform: rotate(45deg);
+    }
+
+    .page::before {
+      left: 20px;
+      top: 20px;
+    }
+
+    .page::after {
+      right: 20px;
+      bottom: 20px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 34px;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 90px;
+      height: 90px;
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      color: var(--copper);
+      background: #fff7e8;
+      font-size: 42px;
+      font-weight: 700;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      color: var(--brown);
+      letter-spacing: 0;
+    }
+
+    h1 {
+      font-size: 22px;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--copper);
+      font-size: 17px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .docnote {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 28px 0 18px;
+      padding: 8px 16px;
+      color: #fffaf0;
+      background: var(--brown);
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .section-title::before,
+    .section-title::after {
+      content: "◆";
+      color: var(--gold);
+      font-size: 13px;
+    }
+
+    .event-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 18px;
+      margin-bottom: 20px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 8px;
+      align-items: baseline;
+      color: var(--copper);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      border-bottom: 1px solid #b88b57;
+      border-radius: 0;
+      padding: 3px 4px;
+      color: var(--ink);
+      background: rgba(255, 250, 243, 0.72);
+      font: inherit;
+      font-weight: 400;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 42px;
+      resize: vertical;
+      line-height: 1.35;
+    }
+
+    input:focus,
+    textarea:focus {
+      background: #fff;
+      box-shadow: 0 2px 0 var(--copper);
+    }
+
+    p {
+      margin: 0 0 13px;
+      font-size: 14px;
+      line-height: 1.48;
+    }
+
+    .clause {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 0;
+      margin: 12px 0;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .clause strong {
+      color: var(--copper);
+    }
+
+    .inline-field {
+      display: inline-block;
+      width: 52px;
+      margin: 0 3px;
+      vertical-align: baseline;
+    }
+
+    .value-box {
+      display: grid;
+      justify-content: center;
+      gap: 8px;
+      margin: 18px 0 34px;
+      text-align: center;
+    }
+
+    .value-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--brown);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .value-line input {
+      max-width: 150px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .signatures {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 44px;
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .signature-line {
+      min-height: 60px;
+      border-bottom: 1px solid var(--brown);
+    }
+
+    .signature-title {
+      margin-top: 10px;
+      color: var(--brown);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .signature-subtitle input {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .place-date {
+      width: 52%;
+      margin: 34px auto 0;
+      text-align: center;
+    }
+
+    .place-date input {
+      text-align: center;
+    }
+
+    footer {
+      margin-top: 42px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        padding: 30px 22px;
+      }
+
+      header,
+      .event-grid,
+      .signatures {
+        grid-template-columns: 1fr;
+      }
+
+      .mark {
+        margin: 0 auto;
+      }
+
+      label {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+
+      .place-date {
+        width: 100%;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .toolbar {
+        display: none;
+      }
+
+      main {
+        width: auto;
+        margin: 0;
+        padding: 0;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+        break-after: page;
+      }
+
+      input,
+      textarea {
+        background: transparent;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar" aria-label="Ações do contrato">
+    <button type="button" id="saveButton">Salvar dados</button>
+    <button type="button" class="secondary" id="printButton">Imprimir</button>
+    <button type="button" class="secondary" id="downloadButton">Baixar preenchido</button>
+    <button type="button" class="danger" id="clearButton">Limpar para novo contrato</button>
+    <span class="status" id="status">Pronto para preencher.</span>
+  </div>
+
+  <main>
+    <form class="page" id="contractForm">
+      <header>
+        <div class="mark" aria-hidden="true">♪</div>
+        <div>
+          <h1>Contrato de Prestação de Serviço</h1>
+          <div class="subtitle">de Evento Musical</div>
+          <div class="docnote">
+            Documento de formalização de contratação artística<br>
+            <input name="ano" aria-label="Ano do contrato" value="2025">
+          </div>
+        </div>
+      </header>
+
+      <div class="section-title">Dados do Evento</div>
+      <div class="event-grid">
+        <label>Aniversariante:
+          <input name="aniversariante" value="Flávia Seabra">
+        </label>
+        <label>Data do Evento:
+          <input name="dataEvento" value="23/05 (sábado)">
+        </label>
+        <label>Horário:
+          <input name="horario" value="A partir das 14h">
+        </label>
+        <label>E-mail:
+          <input type="email" name="email" value="marcusvillacosta@hotmail.com">
+        </label>
+        <label class="full">Endereço:
+          <textarea name="endereco">Rua Sócrates Guanaes Gomes, 11 - Ed. Mansão Oswald de Andrade, ap. 302, Cidade Jardim</textarea>
+        </label>
+      </div>
+
+      <div class="section-title">1. Objeto</div>
+      <p>
+        O CONTRATADO compromete-se a realizar apresentação musical ao vivo com duração de
+        <input class="inline-field" name="duracaoNumero" value="03" aria-label="Duração em números">
+        (<input class="inline-field" name="duracaoExtenso" value="três" aria-label="Duração por extenso">)
+        horas, incluindo intervalo, na data, horário e local especificados acima.
+      </p>
+      <div class="clause">
+        <strong>§ 1º</strong>
+        <span>O CONTRATADO não se responsabiliza por fatores externos que impeçam ou dificultem a realização do evento, exceto por falhas em seu próprio equipamento.</span>
+      </div>
+      <div class="clause">
+        <strong>§ 2º</strong>
+        <span>Em caso de desistência por qualquer das partes após a assinatura deste instrumento, será aplicada multa equivalente a 50% (cinquenta por cento) do valor total do contrato.</span>
+      </div>
+
+      <div class="section-title">2. Pagamento</div>
+      <p>
+        A assinatura deste contrato requer o pagamento antecipado de 50% (cinquenta por cento) do valor total acordado. O saldo restante deverá ser quitado integralmente ao final da apresentação, antes da desmontagem do equipamento.
+      </p>
+
+      <div class="section-title">3. Condições Gerais</div>
+      <p>
+        O CONTRATANTE compromete-se a garantir condições adequadas para a realização do evento, incluindo: fornecimento de energia elétrica estável (mínimo 2 tomadas 20A), espaço físico adequado para instalação do equipamento, e acesso ao local com antecedência mínima de 60 minutos para montagem.
+      </p>
+
+      <div class="section-title">4. Valor Contratado</div>
+      <div class="value-box">
+        <div class="value-line">
+          Valor Total:
+          <input name="valorTotal" value="R$ 1.100,00">
+        </div>
+        <div class="small-note">(50% na assinatura + 50% ao final da apresentação)</div>
+      </div>
+
+      <div class="section-title">Assinaturas</div>
+      <p class="small-note" style="text-align:center">
+        Ao assinar este documento, ambas as partes declaram estar cientes e de acordo com todas as cláusulas acima.
+      </p>
+
+      <div class="signatures">
+        <div>
+          <div class="signature-line"></div>
+          <div class="signature-title">Contratado</div>
+          <div class="signature-subtitle">
+            <input name="contratado" value="Músico / Artista" aria-label="Nome do contratado">
+          </div>
+        </div>
+        <div>
+          <div class="signature-line"></div>
+          <div class="signature-title">Contratante</div>
+          <div class="signature-subtitle">
+            <input name="contratante" value="Flávia Seabra" aria-label="Nome do contratante">
+          </div>
+        </div>
+      </div>
+
+      <div class="place-date">
+        <input name="localData" value="" aria-label="Local e data">
+        <div class="small-note">Local e Data</div>
+      </div>
+
+      <footer>
+        Documento gerado para formalização de serviço artístico - 1 via para cada parte
+      </footer>
+    </form>
+  </main>
+
+  <script>
+    const form = document.querySelector("#contractForm");
+    const fields = [...form.querySelectorAll("input, textarea")];
+    const status = document.querySelector("#status");
+    const storageKey = "contrato-evento-musical-dados";
+    const initialValues = Object.fromEntries(fields.map((field) => [field.name, field.value]));
+
+    function collectData() {
+      return Object.fromEntries(fields.map((field) => [field.name, field.value]));
+    }
+
+    function applyData(data) {
+      fields.forEach((field) => {
+        if (Object.prototype.hasOwnProperty.call(data, field.name)) {
+          field.value = data[field.name];
+        }
+      });
+    }
+
+    function setStatus(message) {
+      status.textContent = message;
+      window.clearTimeout(setStatus.timer);
+      setStatus.timer = window.setTimeout(() => {
+        status.textContent = "Pronto para preencher.";
+      }, 2800);
+    }
+
+    function saveData() {
+      localStorage.setItem(storageKey, JSON.stringify(collectData()));
+      setStatus("Dados salvos neste navegador.");
+    }
+
+    function clearData() {
+      if (!confirm("Limpar todos os campos para começar um novo contrato?")) return;
+      applyData(Object.fromEntries(Object.keys(initialValues).map((name) => [name, ""])));
+      localStorage.removeItem(storageKey);
+      setStatus("Campos limpos.");
+    }
+
+    function downloadFilledContract() {
+      saveData();
+      const clone = document.documentElement.cloneNode(true);
+      clone.querySelectorAll("input, textarea").forEach((field) => {
+        field.setAttribute("value", field.value);
+        if (field.tagName === "TEXTAREA") field.textContent = field.value;
+      });
+      const html = "<!doctype html>\n" + clone.outerHTML;
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "contrato-evento-musical-preenchido.html";
+      link.click();
+      URL.revokeObjectURL(url);
+      setStatus("Arquivo preenchido baixado.");
+    }
+
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        applyData(JSON.parse(saved));
+        setStatus("Dados salvos carregados.");
+      } catch {
+        localStorage.removeItem(storageKey);
+      }
+    }
+
+    fields.forEach((field) => {
+      field.addEventListener("input", () => {
+        localStorage.setItem(storageKey, JSON.stringify(collectData()));
+      });
+    });
+
+    document.querySelector("#saveButton").addEventListener("click", saveData);
+    document.querySelector("#printButton").addEventListener("click", () => window.print());
+    document.querySelector("#downloadButton").addEventListener("click", downloadFilledContract);
+    document.querySelector("#clearButton").addEventListener("click", clearData);
+  </script>
+</body>
+</html>
