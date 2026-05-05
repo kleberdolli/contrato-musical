@@ -415,7 +415,7 @@
           <div class="subtitle">de Evento Musical</div>
           <div class="docnote">
             Documento de formalização de contratação artística<br>
-            <input name="ano" aria-label="Ano do contrato" value="2025">
+          <input name="ano" aria-label="Ano do contrato" value="">
           </div>
         </div>
       </header>
@@ -423,27 +423,27 @@
       <div class="section-title">Dados do Evento</div>
       <div class="event-grid">
         <label>Contratante:
-          <input name="aniversariante" value="Flávia Seabra">
+          <input name="aniversariante" value="">
         </label>
         <label>Data do Evento:
-          <input name="dataEvento" value="23/05 (sábado)">
+          <input name="dataEvento" value="">
         </label>
         <label>Horário:
-          <input name="horario" value="A partir das 14h">
+          <input name="horario" value="">
         </label>
         <label>E-mail:
-          <input type="email" name="email" value="marcusvillacosta@hotmail.com">
+          <input type="email" name="email" value="">
         </label>
         <label class="full">Endereço:
-          <textarea name="endereco">Rua Sócrates Guanaes Gomes, 11 - Ed. Mansão Oswald de Andrade, ap. 302, Cidade Jardim</textarea>
+          <textarea name="endereco"></textarea>
         </label>
       </div>
 
       <div class="section-title">1. Objeto</div>
       <p>
         O CONTRATADO compromete-se a realizar apresentação musical ao vivo com duração de
-        <input class="inline-field" name="duracaoNumero" value="03" aria-label="Duração em números">
-        (<input class="inline-field" name="duracaoExtenso" value="três" aria-label="Duração por extenso">)
+        <input class="inline-field" name="duracaoNumero" value="" aria-label="Duração em números">
+        (<input class="inline-field" name="duracaoExtenso" value="" aria-label="Duração por extenso">)
         horas, incluindo intervalo, na data, horário e local especificados acima.
       </p>
       <div class="clause">
@@ -469,7 +469,7 @@
       <div class="value-box">
         <div class="value-line">
           Valor Total:
-          <input name="valorTotal" value="R$ 1.100,00">
+          <input name="valorTotal" value="">
         </div>
         <div class="small-note">(50% na assinatura + 50% ao final da apresentação)</div>
       </div>
@@ -484,14 +484,14 @@
           <div class="signature-line"></div>
           <div class="signature-title">Contratado</div>
           <div class="signature-subtitle">
-            <input name="contratado" value="Músico / Artista" aria-label="Nome do contratado">
+            <input name="contratado" value="" aria-label="Nome do contratado">
           </div>
         </div>
         <div>
           <div class="signature-line"></div>
           <div class="signature-title">Contratante</div>
           <div class="signature-subtitle">
-            <input name="contratante" value="Flávia Seabra" aria-label="Nome do contratante">
+            <input name="contratante" value="" aria-label="Nome do contratante">
           </div>
         </div>
       </div>
@@ -511,7 +511,7 @@
     const form = document.querySelector("#contractForm");
     const fields = [...form.querySelectorAll("input, textarea")];
     const status = document.querySelector("#status");
-    const storageKey = "contrato-evento-musical-dados";
+    const storageKey = "contrato-evento-musical-dados-v2";
     const initialValues = Object.fromEntries(fields.map((field) => [field.name, field.value]));
 
     function collectData() {
